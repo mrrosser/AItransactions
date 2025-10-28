@@ -1,0 +1,2 @@
+import { getSetting } from '../store/settings'
+export async function requireLicense(req:any,res:any,next:any){ if(process.env.REQUIRE_LICENSE!=='true') return next(); const inc=(req.headers['x-license-key']||req.query.license||'').toString(); const cur=(await getSetting('LICENSE_KEY'))||process.env.LICENSE_KEY||''; if(!inc||inc!==cur) return res.status(401).json({error:'license_required'}); next() }

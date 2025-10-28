@@ -1,0 +1,2 @@
+import { getDB } from './ensure'
+export function log(level:'info'|'warn'|'error', msg:string){ const db=getDB(); db.prepare('INSERT INTO logs(level,msg,ts) VALUES (?,?,?)').run(level,msg,Date.now()) } export function recentLogs(since:number){ const db=getDB(); return db.prepare('SELECT level,msg,ts FROM logs WHERE ts>? ORDER BY ts ASC').all(since) as any[] }

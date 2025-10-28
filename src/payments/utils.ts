@@ -1,0 +1,1 @@
+export function redact(s:string){return s.replace(/([A-Za-z0-9_]{6})[A-Za-z0-9_]+/g,'$1…')} export function safeLog(t:string,d:any){ const j=JSON.parse(JSON.stringify(d,(_k,v)=>(typeof v==='string'&&v.length>20?redact(v):v))); console.log('\n=== '+t+' ==='); console.dir(j,{depth:6}) }

@@ -1,0 +1,2 @@
+import crypto from 'crypto'
+export function verifyHMAC(rawBody:string, sig:string, secret:string){ const s=crypto.createHmac('sha256',secret).update(rawBody).digest('hex'); return crypto.timingSafeEqual(Buffer.from(s),Buffer.from(sig||'')) }

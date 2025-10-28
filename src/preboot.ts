@@ -1,0 +1,1 @@
+import 'dotenv/config'; import { ensureStores } from './store/ensure'; await ensureStores(); console.log('preboot OK')

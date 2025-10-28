@@ -1,0 +1,1 @@
+export async function enforcePolicy(i:any){ const max=1_000_000; if(i.amountMinor>max) throw new Error('Policy: cap exceeded') }

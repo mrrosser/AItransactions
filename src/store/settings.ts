@@ -1,0 +1,2 @@
+import { getDB } from './ensure'
+const db=getDB(); export function setSetting(k:string,v:string){ db.prepare('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value').run(k,v) } export function getSetting(k:string){ const r=db.prepare('SELECT value FROM settings WHERE key=?').get(k) as any; return r?.value??null } export function getFlag(k:string){ return (getSetting(k)??'false')==='true' }

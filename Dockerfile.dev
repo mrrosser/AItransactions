@@ -1,0 +1,8 @@
+FROM node:20-slim
+WORKDIR /app
+ENV NODE_ENV=development
+RUN npm i -g pnpm
+COPY package.json /app/
+RUN pnpm i || npm i
+EXPOSE 8787
+CMD ["npm","run","api"]

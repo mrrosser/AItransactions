@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  api:
+    build: .
+    image: agentic-all-in-one-complete:latest
+    ports: ['8787:8787']
+    env_file: .env
+    volumes:
+      - ./sqlite.db:/app/sqlite.db
