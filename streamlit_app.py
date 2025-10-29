@@ -4,15 +4,29 @@ from typing import Any, Dict, Optional
 import requests
 import streamlit as st
 
+
+def _safe_secret(key: str) -> Optional[str]:
+    try:
+        secrets_obj = st.secrets  # type: ignore[attr-defined]
+    except Exception:
+        return None
+    try:
+        if hasattr(secrets_obj, "get"):
+            return secrets_obj.get(key)  # type: ignore[attr-defined]
+        return secrets_obj[key]  # type: ignore[index]
+    except Exception:
+        return None
+
+
 DEFAULT_BASE_URL = "http://localhost:8787"
 CONTROL_CENTER_URL = (
-    st.secrets.get("CONTROL_CENTER_URL")
-    or os.environ.get("CONTROL_CENTER_URL")
+    os.environ.get("CONTROL_CENTER_URL")
+    or _safe_secret("CONTROL_CENTER_URL")
     or DEFAULT_BASE_URL
 ).rstrip("/")
 API_BASE_URL = (
-    st.secrets.get("API_BASE_URL")
-    or os.environ.get("API_BASE_URL")
+    os.environ.get("API_BASE_URL")
+    or _safe_secret("API_BASE_URL")
     or CONTROL_CENTER_URL
 ).rstrip("/")
 
@@ -61,10 +75,6 @@ def put_json(path: str, payload: Dict[str, Any]) -> bool:
 
 
 st.title("AI Transactions Control Hub")
-st.caption(
-    "Configure CONTROL_CENTER_URL / API_BASE_URL in Streamlit secrets to point "
-    "at your running Express API (default assumes localhost:8787)."
-)
 st.link_button(
     "Launch Full Dashboard",
     CONTROL_CENTER_URL,
@@ -96,6 +106,13 @@ st.link_button(
 
 health = fetch_json("/api/health")
 api_online = bool(health)
+if api_online:
+    st.caption(f"Connected to Express API at {API_BASE_URL}.")
+else:
+    st.caption(
+        "Set CONTROL_CENTER_URL / API_BASE_URL in secrets or env vars to point "
+        "at your running Express API (default expects localhost:8787)."
+    )
 
 with tab_welcome:
     st.subheader("Welcome")
@@ -319,7 +336,7 @@ with tab_mandates:
                 f"**{mandate.get('scope')}** {mandate.get('issuer_did')} -> {mandate.get('subject_did')}"
             )
             cols[1].write(
-                f"{mandate.get('currency')} max {mandate.get('max_amount_minor')} � Expires {mandate.get('expires_at')}"
+                f"{mandate.get('currency')} max {mandate.get('max_amount_minor')} Â· Expires {mandate.get('expires_at')}"
             )
             if cols[2].button(
                 "Revoke",
@@ -361,3 +378,4 @@ with tab_inbound:
         st.json(events)
     else:
         st.info("No inbound events recorded.")
+
